@@ -1,0 +1,4 @@
+*.zip
+*.json
+outline.env
+export/

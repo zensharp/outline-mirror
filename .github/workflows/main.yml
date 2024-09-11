@@ -1,0 +1,28 @@
+name: Backup Outline Wiki
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+env:
+  OUTLINE_INSTANCE_URL: ${{ vars.OUTLINE_INSTANCE_URL }}
+  OUTLINE_API_KEY: ${{ secrets.OUTLINE_API_KEY }}
+
+jobs:
+  export-collections:
+    runs-on: ubuntu-latest
+    container:
+      image: antyadev/dotnet-script
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Download exports
+        run: scripts/main.csx
+      - name: Deploy export
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: outline
+          FOLDER: export
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
