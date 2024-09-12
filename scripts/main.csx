@@ -25,17 +25,31 @@ var apiUrl = url + "/api";
 var apiKey = Environment.GetEnvironmentVariable("OUTLINE_API_KEY");
 var throttle = 5000;
 
-// Begin
-var srcFile = await GetExportAsync("outline-markdown", "Markdown");
-
-var destDir = "export";
-if (Directory.Exists(destDir))
+void rm(string path)
 {
-	Directory.Delete(destDir, true);
+	if (Directory.Exists(path))
+	{
+		Directory.Delete(path, true);
+	}
 }
-WriteLine($"Extracting export...");
-ZipFile.ExtractToDirectory(srcFile, destDir);
 
+// Begin
+// Get markdown export
+var markdownZip = await GetExportAsync("outline-markdown", "Markdown");
+var markdownDestDir = "export-markdown";
+rm(markdownDestDir);
+ZipFile.ExtractToDirectory(markdownZip, markdownDestDir);
+
+WriteLine();
+
+// Get json export
+var jsonZip = await GetExportAsync("json", "JSON");
+var jsonDestDir = "export-json";
+rm(jsonDestDir);
+WriteLine($"Extracting {jsonZip}...");
+ZipFile.ExtractToDirectory(jsonZip, jsonDestDir);
+
+// Functions
 async Task<string> GetExportAsync(string format, string displayName)
 {
 	WriteLine($"Requesting {displayName} export...");
@@ -54,7 +68,6 @@ async Task<string> GetExportAsync(string format, string displayName)
 	Console.ForegroundColor = ConsoleColor.Green;
 	WriteLine($"Downloaded {filename}!");
 	Console.ResetColor();
-	WriteLine();
 
 	return filename;
 }
