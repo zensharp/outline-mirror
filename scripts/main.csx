@@ -38,6 +38,7 @@ void rm(string path)
 var markdownZip = await GetExportAsync("outline-markdown", "Markdown");
 var markdownDestDir = "export-markdown";
 rm(markdownDestDir);
+WriteLine($"Extracting zip...");
 ZipFile.ExtractToDirectory(markdownZip, markdownDestDir);
 
 WriteLine();
@@ -46,7 +47,7 @@ WriteLine();
 var jsonZip = await GetExportAsync("json", "JSON");
 var jsonDestDir = "export-json";
 rm(jsonDestDir);
-WriteLine($"Extracting {jsonZip}...");
+WriteLine($"Extracting zip...");
 ZipFile.ExtractToDirectory(jsonZip, jsonDestDir);
 
 // Functions
@@ -55,7 +56,7 @@ async Task<string> GetExportAsync(string format, string displayName)
 	WriteLine($"Requesting {displayName} export...");
 	var fileOperation = await TriggerExportAsync(format);
 	Console.ForegroundColor = ConsoleColor.Cyan;
-	WriteLine($"Export started for {fileOperation.name} ({fileOperation.id})...");
+	WriteLine($"Export started ({fileOperation.id})...");
 	Console.ResetColor();
 	
 	WriteLine($"Waiting for export to finish processing...");
@@ -64,10 +65,6 @@ async Task<string> GetExportAsync(string format, string displayName)
 	WriteLine($"Downloading export file...");
 	var filename = fileOperation.name;
 	await DownloadFileAsync(fileOperation.id, filename);
-
-	Console.ForegroundColor = ConsoleColor.Green;
-	WriteLine($"Downloaded {filename}!");
-	Console.ResetColor();
 
 	return filename;
 }
