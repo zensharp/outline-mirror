@@ -2,11 +2,10 @@ name: Deploy Snapshots to Git
 
 on:
   workflow_call:
-    secrets:
-      OUTLINE_INSTANCE_URL:
-        required: true
-      OUTLINE_API_TOKEN:
-        required: true
+
+env:
+  OUTLINE_INSTANCE_URL: {{ secrets.OUTLINE_INSTANCE_URL }}
+  OUTLINE_API_TOKEN: {{ secrets.OUTLINE_API_TOKEN }}
 
 jobs:
   deploy_snapshots_git:
