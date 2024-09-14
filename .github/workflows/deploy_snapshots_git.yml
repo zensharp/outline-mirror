@@ -10,7 +10,7 @@ env:
 jobs:
   deploy_snapshots_git:
     runs-on: ubuntu-latest
-    container: ghcr.io/zensharp/outline-mirror:latest
+    container: ghcr.io/zensharp/outline-snapshot:latest
     steps:
       - name: Export Outline
         run: outline-mirror
