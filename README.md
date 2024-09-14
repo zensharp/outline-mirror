@@ -7,6 +7,6 @@ Outline Snapshot uses the [Outline API](https://www.getoutline.com/developers) t
 
 # Building the image locally
 ```
-docker build -t outline-mirror
-docker run -it outline-mirror
+docker build -t outline-snapshot
+docker run -it outline-snapshot
 ```
