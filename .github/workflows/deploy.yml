@@ -1,0 +1,50 @@
+name: Deploy snapshots to repository
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        required: true
+        type: string
+    secrets:
+      OUTLINE_INSTANCE_URL:
+        required: true
+      OUTLINE_API_KEY:
+        required: true
+      OUTPUT_REPO_URL:
+        required: true
+      OUTPUT_SSH_KEY:
+        required: true
+
+jobs:
+  deploy_snapshots_to_repo:
+    runs-on: ubuntu-latest
+    container: ghcr.io/zensharp/outline-snapshot:latest
+    environment:
+      name: ${{ inputs.ENVIRONMENT }}
+    steps:
+      - name: Setup SSH authentication
+        run: |
+          mkdir -p /root/.ssh
+          ssh-keyscan -H github.com >> /root/.ssh/known_hosts
+          echo "${{ secrets.OUTPUT_SSH_KEY }}" > /root/.ssh/id_rsa
+          chmod 600 /root/.ssh/id_rsa
+      - name: Generate snapshots
+        run: |
+          export OUTLINE_INSTANCE_URL=${{ secrets.OUTLINE_INSTANCE_URL }}
+          export OUTLINE_API_KEY=${{ secrets.OUTLINE_API_KEY }}
+          outline-mirror
+      - name: Deploy snapshot (Markdown)
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: ${{ secrets.OUTPUT_REPO_URL }}
+          BRANCH: main
+          FOLDER: export-markdown
+          SSH_PRIVATE_KEY: ${{ secrets.OUTPUT_SSH_KEY }}
+      - name: Deploy snapshot (JSON)
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: ${{ secrets.OUTPUT_REPO_URL }}
+          BRANCH: json
+          FOLDER: export-json
+          SSH_PRIVATE_KEY: ${{ secrets.OUTPUT_SSH_KEY }}
