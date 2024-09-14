@@ -2,10 +2,6 @@ name: Deploy snapshots to self
 
 on:
   workflow_call:
-    inputs:
-      ENVIRONMENT:
-        required: true
-        type: string
     secrets:
       OUTLINE_INSTANCE_URL:
         required: true
@@ -16,8 +12,6 @@ jobs:
   deploy_snapshots_to_self:
     runs-on: ubuntu-latest
     container: ghcr.io/zensharp/outline-mirror:latest
-    environment:
-      name: ${{ inputs.ENVIRONMENT }}
     steps:
       - name: Generate snapshots
         run: |
