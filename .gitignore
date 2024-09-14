@@ -2,3 +2,4 @@
 *.json
 outline.env
 export-*/
+publish/
