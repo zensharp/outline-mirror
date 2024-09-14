@@ -40,7 +40,6 @@ jobs:
           REPO: ${{ secrets.OUTPUT_REPO_URL }}
           BRANCH: main
           FOLDER: export-markdown
-          SKIP_EMPTY_COMMITS: true
           SSH_PRIVATE_KEY: ${{ secrets.OUTPUT_SSH_KEY }}
       - name: Deploy snapshot (JSON)
         uses: s0/git-publish-subdir-action@develop
@@ -48,5 +47,4 @@ jobs:
           REPO: ${{ secrets.OUTPUT_REPO_URL }}
           BRANCH: json
           FOLDER: export-json
-          SKIP_EMPTY_COMMITS: true
           SSH_PRIVATE_KEY: ${{ secrets.OUTPUT_SSH_KEY }}

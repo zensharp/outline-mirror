@@ -25,7 +25,6 @@ jobs:
           BRANCH: mirror/markdown
           FOLDER: export-markdown
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SKIP_EMPTY_COMMITS: true
       - name: Deploy snapshot (JSON)
         uses: s0/git-publish-subdir-action@develop
         env:
@@ -33,4 +32,3 @@ jobs:
           BRANCH: mirror/json
           FOLDER: export-json
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SKIP_EMPTY_COMMITS: true
