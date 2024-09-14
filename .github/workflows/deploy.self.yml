@@ -15,7 +15,7 @@ on:
 jobs:
   deploy_snapshots_to_self:
     runs-on: ubuntu-latest
-    container: ghcr.io/zensharp/outline-snapshot:latest
+    container: ghcr.io/zensharp/outline-mirror:latest
     environment:
       name: ${{ inputs.ENVIRONMENT }}
     steps:
