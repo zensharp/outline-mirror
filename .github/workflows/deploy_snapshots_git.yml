@@ -1,0 +1,31 @@
+name: Deploy Snapshots to Git
+
+on:
+  workflow_call:
+  secrets:
+    OUTLINE_INSTANCE_URL:
+      required: true
+    OUTLINE_API_TOKEN:
+      required: true
+
+jobs:
+  deploy_snapshots_git:
+    runs-on: ubuntu-latest
+    container: ghcr.io/zensharp/outline-mirror:latest
+    steps:
+      - name: Export Outline
+        run: outline-mirror
+      - name: Deploy snapshot (JSON)
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: mirror/json
+          FOLDER: export-json
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy snapshot (Markdown)
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: mirror/markdown
+          FOLDER: export-markdown
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
