@@ -38,9 +38,8 @@ void rm(string path)
 // -------
 // PROGRAM
 // -------
-var markdownTask = ExportAsync("outline-markdown", "Markdown", "export-markdown");
-var jsonTask = ExportAsync("json", "JSON", "export-json");
-await Task.WhenAll(markdownTask, jsonTask);
+await ExportAsync("outline-markdown", "Markdown", "export-markdown");
+await ExportAsync("json", "JSON", "export-json");
 
 // ---------
 // FUNCTIONS
