@@ -19,7 +19,9 @@ class FileOperation
 	public string state = null;
 }
 
-// Environment
+// -----------
+// ENVIRONMENT
+// -----------
 var url = Environment.GetEnvironmentVariable("OUTLINE_INSTANCE_URL");
 var apiUrl = url + "/api";
 var apiKey = Environment.GetEnvironmentVariable("OUTLINE_API_KEY");
@@ -33,40 +35,39 @@ void rm(string path)
 	}
 }
 
-// Begin
-// Get markdown export
-var markdownZip = await GetExportAsync("outline-markdown", "Markdown");
-var markdownDestDir = "export-markdown";
-rm(markdownDestDir);
-WriteLine($"Extracting zip...");
-ZipFile.ExtractToDirectory(markdownZip, markdownDestDir);
+// -------
+// PROGRAM
+// -------
+var markdownTask = ExportAsync("outline-markdown", "Markdown", "export-markdown");
+var jsonTask = ExportAsync("json", "JSON", "export-json");
+await Task.WhenAll(markdownTask, jsonTask);
 
-WriteLine();
-
-// Get json export
-var jsonZip = await GetExportAsync("json", "JSON");
-var jsonDestDir = "export-json";
-rm(jsonDestDir);
-WriteLine($"Extracting zip...");
-ZipFile.ExtractToDirectory(jsonZip, jsonDestDir);
-
-// Functions
-async Task<string> GetExportAsync(string format, string displayName)
+// ---------
+// FUNCTIONS
+// ---------
+async Task ExportAsync(string format, string displayName, string destDir)
 {
-	WriteLine($"Requesting {displayName} export...");
+	var suffix = $"[{displayName}]".PadRight(12);
+
+	WriteLine($"{suffix}Requesting export...");
 	var fileOperation = await TriggerExportAsync(format);
 	Console.ForegroundColor = ConsoleColor.Cyan;
-	WriteLine($"Export started ({fileOperation.id})...");
+	WriteLine($"{suffix}Export started ({fileOperation.id})...");
 	Console.ResetColor();
 	
-	WriteLine($"Waiting for export to finish processing...");
+	WriteLine($"{suffix}Waiting for export to finish processing...");
 	await WaitForFileToCompleteAsync(fileOperation.id);
 
-	WriteLine($"Downloading export file...");
+	WriteLine($"{suffix}Downloading export file...");
 	var filename = fileOperation.name;
 	await DownloadFileAsync(fileOperation.id, filename);
 
-	return filename;
+	WriteLine($"{suffix}Removing export from Outline...");
+	await DeleteFileOperationAsync(fileOperation.id);
+
+	WriteLine($"{suffix}Extracting zip...");
+	rm(destDir);
+	ZipFile.ExtractToDirectory(filename, destDir);
 }
 
 async Task<FileOperation> TriggerExportAsync(string format)
@@ -95,7 +96,6 @@ async Task WaitForFileToCompleteAsync(string id)
 {
 	while (true)
 	{
-		WriteLine("Sleeping for 5 seconds...");
 		await Task.Delay(throttle);
 
 		var infoResponse = await apiUrl.AppendPathSegment("fileOperations.info")
@@ -124,4 +124,15 @@ async Task DownloadFileAsync(string id, string filename)
 		});
 
 	File.WriteAllBytes(filename, await redirectResponse.GetBytesAsync());
+}
+
+async Task DeleteFileOperationAsync(string id)
+{
+	var deleteResponse = await apiUrl.AppendPathSegment("fileOperations.delete")
+		.WithOAuthBearerToken(apiKey)
+		.PostJsonAsync(new
+		{
+			id = id,
+		});
+	var jobject = JObject.Parse(await deleteResponse.GetStringAsync());
 }
